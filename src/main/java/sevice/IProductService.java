@@ -10,5 +10,5 @@ public interface IProductService {
     public void insertProduct(Product product) throws SQLException;
     String getNameProductByID(int id);
     void update(int id, Product product);
-    void delete(int id);
+    boolean delete(int id) throws SQLException;
 }

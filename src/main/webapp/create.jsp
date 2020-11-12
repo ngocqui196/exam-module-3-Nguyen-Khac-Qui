@@ -56,7 +56,7 @@
             <tr>
                 <th>Loại sản phẩm:</th>
                 <td>
-                    <input type="text" name="name_category" id="name_category" size="15"/>
+                    <input type="text" name="id_category" id="id_category" size="15"/>
                 </td>
             </tr>
             <tr>

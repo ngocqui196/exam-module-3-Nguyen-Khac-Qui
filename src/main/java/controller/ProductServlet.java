@@ -51,32 +51,49 @@ public class ProductServlet extends javax.servlet.http.HttpServlet {
         if (action == null) {
             action = "";
         }
-
-        switch (action) {
-            case "create":
-                showCreateProduct(request,response);
-                break;
-            case "edit":
+        try {
+            switch (action) {
+                case "create":
+                    showCreateProduct(request,response);
+                    break;
+                case "edit":
 //                showEditForm(request, response);
-                break;
-            case "delete":
-//                    deleteProduct(request, response);
-                break;
-            case "sort":
+                    break;
+                case "delete":
+                    deleteProduct(request, response);
+                    break;
+                case "sort":
 //                    sortListProduct(request,response);
-                break;
-            case "categoriList":
+                    break;
+                case "categoriList":
 //                showListCategory(request,response);
-            default:
+                default:
                     listProduct(request, response);
-                break;
+                    break;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+
+
+    }
+
+    private void deleteProduct(HttpServletRequest request, HttpServletResponse response) throws SQLException , ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        try {
+            iProductService.delete(id);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        listProduct(request,response);
     }
 
     private void listProduct(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Product> productList = iProductService.listProduct();
+        System.out.println(productList);
         request.setAttribute("listProducts", productList);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("list.jsp");
         dispatcher.forward(request, response);
     }
 
@@ -107,9 +124,7 @@ public class ProductServlet extends javax.servlet.http.HttpServlet {
 
         Product product = new Product(nameProduct,priceProduct,amountProduct,colorProduct,detailProduct,category);
         iProductService.insertProduct(product);
-
-        RequestDispatcher dispatcher = request.getRequestDispatcher("create.jsp");
-        dispatcher.forward(request, response);
+        listProduct(request,response);
     }
 
 }

@@ -9,13 +9,14 @@ import java.util.List;
 
 public class ProductServiceImpl implements IProductService{
 
-    private String jdbcURL = "jdbc:mysql://localhost:3306/linkkool?useSSL=false";
+    private String jdbcURL = "jdbc:mysql://localhost:3306/exam?useSSL=false";
     private String jdbcUsername = "root";
     private String jdbcPassword = "Vuoncodai123";
 
 
 
-    private static final String SELECT_ALL_PRODUCT_SQL = "select name,price,amount,color,detail,id_category from exam.product;";
+    private static final String SELECT_ALL_PRODUCT_SQL = "select * from exam.product;";
+    private static final String DELETE_PRODUCT_SQL = "delete from exam.product where id = ?;";
     private static final String INSERT_PRODUCT_SQL = "INSERT INTO exam.product"
             + " (name, price,amount,color,detail,id_category) VALUES " +
             " (?, ?, ?, ?, ?, ?);";
@@ -44,6 +45,7 @@ public class ProductServiceImpl implements IProductService{
             System.out.println(ps);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
+                int idProduct = rs.getInt("id");
                 String nameProduct = rs.getString("name");
                 double priceProduct = rs.getDouble("price");
                 int amountProduct = rs.getInt("amount");
@@ -51,7 +53,7 @@ public class ProductServiceImpl implements IProductService{
                 String detailProduct = rs.getString("detail");
                 int idCategori = rs.getInt("id_category");
                 Category categori = iCategorySevice.getCategoryByName(idCategori);
-                productList.add(new Product(nameProduct,priceProduct,amountProduct,colorProduct,detailProduct,categori));
+                productList.add(new Product(idProduct,nameProduct,priceProduct,amountProduct,colorProduct,detailProduct,categori));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -66,7 +68,7 @@ public class ProductServiceImpl implements IProductService{
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(INSERT_PRODUCT_SQL)) {
             ps.setString(1, product.getName());
-            ps.setDouble(6, product.getPrice());
+            ps.setDouble(2, product.getPrice());
             ps.setInt(3, product.getAmount());
             ps.setString(4, product.getColor());
             ps.setString(5, product.getDetail());
@@ -87,7 +89,13 @@ public class ProductServiceImpl implements IProductService{
     }
 
     @Override
-    public void delete(int id) {
-
+    public boolean delete(int id) throws SQLException {
+        boolean rowDeleted;
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_PRODUCT_SQL)) {
+            statement.setInt(1, id);
+            rowDeleted = statement.executeUpdate() > 0;
+        }
+        return rowDeleted;
     }
 }
