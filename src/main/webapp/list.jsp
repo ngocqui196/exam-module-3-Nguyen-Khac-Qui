@@ -17,11 +17,15 @@
     <table>
         <tr>
             <td><a href="/products?action=create">Thêm mới sản phẩm</a></td>
+            <td><form action="/products?action=search" method="post">
+                <input type="text" name="search" size="15" placeholder="Enter name product"/>
+                <input type="submit" value="Search"></form></td>
             <td><a href="/products?action=categoriList">Danh sách loại sản phẩm</a></td>
         </tr>
     </table>
 </center>
 <div align="center">
+
     <table border="1" cellpadding="3">
         <caption><h2>Danh sách các sản phẩm</h2></caption>
         <tr>

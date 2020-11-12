@@ -20,6 +20,7 @@ public class ProductServiceImpl implements IProductService{
     private static final String INSERT_PRODUCT_SQL = "INSERT INTO exam.product"
             + " (name, price,amount,color,detail,id_category) VALUES " +
             " (?, ?, ?, ?, ?, ?);";
+    private static final String SEARCH_PRODUCT_SQL = "select * from exam.product where name like concat('%',?,'%');";
 
     protected Connection getConnection() {
         Connection connection = null;
@@ -103,6 +104,35 @@ public class ProductServiceImpl implements IProductService{
             printSQLException(e);
         }
         return product;
+    }
+
+    @Override
+    public List<Product> searchProduct(String name) throws SQLException {
+        List<Product> productList = new ArrayList<>();
+        ICategorySevice iCategorySevice = new CategorySeviceImpl();
+
+        try (Connection connection = getConnection();
+
+             PreparedStatement preparedStatement = connection.prepareStatement(SEARCH_PRODUCT_SQL);) {
+            preparedStatement.setString(1,name);
+            System.out.println(preparedStatement);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int idProduct = rs.getInt("id");
+                String nameProduct = rs.getString("name");
+                double priceProduct = rs.getDouble("price");
+                int amountProduct = Integer.parseInt(rs.getString("amount"));
+                String colorProduct = rs.getString("color");
+                String detailProduct = rs.getString("detail");
+                int idCateGory = Integer.parseInt(rs.getString("id_category"));
+                Category categori = iCategorySevice.getCategoryByID(idCateGory);
+                productList.add(new Product(idProduct, nameProduct, priceProduct, amountProduct,colorProduct,detailProduct,categori));
+            }
+
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return productList;
     }
 
 

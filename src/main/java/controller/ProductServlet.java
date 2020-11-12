@@ -35,11 +35,21 @@ public class ProductServlet extends javax.servlet.http.HttpServlet {
                 case "edit":
                     updateProduct(request,response);
                     break;
+                case "search":
+                    searchProduct(request,response);
                 default:
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void searchProduct(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        String search = request.getParameter("search");
+        List<Product> productList = iProductService.searchProduct(search);
+        request.setAttribute("listProduct",productList);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("search.jsp");
+        dispatcher.forward(request,response);
     }
 
     private void updateProduct(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
