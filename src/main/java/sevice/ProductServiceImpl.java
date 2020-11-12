@@ -13,8 +13,8 @@ public class ProductServiceImpl implements IProductService{
     private String jdbcUsername = "root";
     private String jdbcPassword = "Vuoncodai123";
 
-
-
+    private static final String UPDATE_PRODUCT_SQL = "update exam.product set name = ?,price= ?, amount =? where id = ?;";
+    private static final String SELECT_PRODUCT_BY_ID_SQL = "select * from exam.product where id = ?";
     private static final String SELECT_ALL_PRODUCT_SQL = "select * from exam.product;";
     private static final String DELETE_PRODUCT_SQL = "delete from exam.product where id = ?;";
     private static final String INSERT_PRODUCT_SQL = "INSERT INTO exam.product"
@@ -79,14 +79,47 @@ public class ProductServiceImpl implements IProductService{
     }
 
     @Override
-    public String getNameProductByID(int id) {
-        return null;
+    public Product selectProduct(int id) {
+        Product product = null;
+        // Step 1: Establishing a Connection
+        try (Connection connection = getConnection();
+             // Step 2:Create a statement using connection object
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_PRODUCT_BY_ID_SQL);) {
+
+            preparedStatement.setInt(1, id);
+            System.out.println(preparedStatement);
+            // Step 3: Execute the query or update query
+            ResultSet rs = preparedStatement.executeQuery();
+
+            // Step 4: Process the ResultSet object.
+            while (rs.next()) {
+                String name = rs.getString("id");
+                String email = rs.getString("name");
+                double price = Double.parseDouble(rs.getString("price"));
+
+                product = new Product(id, name,price);
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return product;
     }
+
 
     @Override
-    public void update(int id, Product product) {
-
+    public boolean update(Product product) throws SQLException {
+        boolean rowUpdated;
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_PRODUCT_SQL)) {
+            statement.setString(1, product.getName());
+            statement.setDouble(2, product.getPrice());
+            statement.setInt(3, product.getAmount());
+            statement.setInt(4,product.getId());
+            rowUpdated = statement.executeUpdate() > 0;
+        }
+        return rowUpdated;
     }
+
 
     @Override
     public boolean delete(int id) throws SQLException {
@@ -97,5 +130,21 @@ public class ProductServiceImpl implements IProductService{
             rowDeleted = statement.executeUpdate() > 0;
         }
         return rowDeleted;
+    }
+
+    private void printSQLException(SQLException ex) {
+        for (Throwable e : ex) {
+            if (e instanceof SQLException) {
+                e.printStackTrace(System.err);
+                System.err.println("SQLState: " + ((SQLException) e).getSQLState());
+                System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
+                System.err.println("Message: " + e.getMessage());
+                Throwable t = ex.getCause();
+                while (t != null) {
+                    System.out.println("Cause: " + t);
+                    t = t.getCause();
+                }
+            }
+        }
     }
 }

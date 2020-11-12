@@ -32,13 +32,29 @@ public class ProductServlet extends javax.servlet.http.HttpServlet {
                 case "create":
                     insertProduct(request,response);
                     break;
-                case "update":
+                case "edit":
+                    updateProduct(request,response);
                     break;
                 default:
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateProduct(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        int id  = Integer.parseInt(request.getParameter("id"));
+        String name = request.getParameter("name");
+        double price = Double.parseDouble(request.getParameter("price"));
+        int amount = Integer.parseInt(request.getParameter("amount"));
+
+        Product product = new Product(id,name, price, amount);
+        iProductService.update(product);
+
+
+//        RequestDispatcher dispatcher = request.getRequestDispatcher("list.jsp");
+//        dispatcher.forward(request, response);
+        listProduct(request, response);
     }
 
     protected void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
@@ -57,16 +73,11 @@ public class ProductServlet extends javax.servlet.http.HttpServlet {
                     showCreateProduct(request,response);
                     break;
                 case "edit":
-//                showEditForm(request, response);
+                showEditForm(request, response);
                     break;
                 case "delete":
                     deleteProduct(request, response);
                     break;
-                case "sort":
-//                    sortListProduct(request,response);
-                    break;
-                case "categoriList":
-//                showListCategory(request,response);
                 default:
                     listProduct(request, response);
                     break;
@@ -103,14 +114,11 @@ public class ProductServlet extends javax.servlet.http.HttpServlet {
         dispatcher.forward(request, response);
     }
 
-//    private void showEditForm(HttpServletRequest request, HttpServletResponse response) {
-//        int id = Integer.parseInt(request.getParameter("id"));
-//        Product newProduct =
-//        User existingUser = userDAO.selectUser(id);
-//        RequestDispatcher dispatcher = request.getRequestDispatcher("edit.jsp");
-//        request.setAttribute("user", existingUser);
-//        dispatcher.forward(request, response);
-//    }
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("edit.jsp");
+        dispatcher.forward(request, response);
+    }
     private void insertProduct(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
 

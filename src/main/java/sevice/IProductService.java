@@ -8,7 +8,8 @@ import java.util.List;
 public interface IProductService {
     List<Product> listProduct();
     public void insertProduct(Product product) throws SQLException;
-    String getNameProductByID(int id);
-    void update(int id, Product product);
+    public Product selectProduct(int id);
+
+    boolean update(Product product) throws SQLException;
     boolean delete(int id) throws SQLException;
 }
